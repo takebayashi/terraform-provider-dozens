@@ -13,6 +13,16 @@ resource "dozens_domain" "example_org" {
   name = "example.org"
   mail = "admin@example.org"
 }
+
+resource "dozens_record" "test_example_org" {
+  depends_on = "dozens_domain.example_org"
+  domain = "example.org"
+  name = "test"
+  address = "127.0.0.1"
+  type = "A"
+  ttl = "7200"
+  priority = "10"
+}
 ```
 
 Installation

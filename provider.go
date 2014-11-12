@@ -21,6 +21,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"dozens_domain": resourceDomain(),
+			"dozens_record": resourceRecord(),
 		},
 		ConfigureFunc: configure,
 	}

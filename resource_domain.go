@@ -25,26 +25,22 @@ func resourceDomain() *schema.Resource {
 }
 
 func createDomain(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
+	domain := &dozens.Domain{Name: d.Get("name").(string)}
 	mail := d.Get("mail").(string)
-	list, err := m.(*dozens.Client).AddDomain(name, mail)
-	for _, domain := range list {
-		if domain.Name == name {
-			d.SetId(domain.Id)
-		}
+	domain, err := m.(*dozens.Client).AddDomain(domain, mail)
+	if err != nil {
 	}
-	return err
+	applyDomain(domain, d)
+	return nil
 }
 
 func readDomain(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
-	list, err := m.(*dozens.Client).ListDomains()
-	for _, domain := range list {
-		if domain.Name == name {
-			d.SetId(domain.Id)
-		}
+	domain, err := m.(*dozens.Client).GetDomain(name)
+	if err != nil {
 	}
-	return err
+	applyDomain(domain, d)
+	return nil
 }
 
 func deleteDomain(d *schema.ResourceData, m interface{}) error {
@@ -53,7 +49,14 @@ func deleteDomain(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return nil
 	}
-	_, err = m.(*dozens.Client).DeleteDomain(ddel)
-	d.SetId("")
+	err = m.(*dozens.Client).DeleteDomain(ddel)
+	if err == nil {
+		d.SetId("")
+	}
 	return err
+}
+
+func applyDomain(d *dozens.Domain, r *schema.ResourceData) {
+	r.SetId(d.Id)
+	r.Set("name", d.Name)
 }

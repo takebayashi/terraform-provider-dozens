@@ -9,7 +9,7 @@ func resourceRecord() *schema.Resource {
 	return &schema.Resource{
 		Create: createRecord,
 		Read:   readRecord,
-		Update: nil,
+		Update: updateRecord,
 		Delete: deleteRecord,
 		Schema: map[string]*schema.Schema{
 			"domain": &schema.Schema{
@@ -47,7 +47,7 @@ func createRecord(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	name := d.Get("name").(string)
-	record := &dozens.Record{Name: name, Type: d.Get("type").(string), Prio: d.Get("priority").(string), Content: d.Get("address").(string), Ttl: d.Get("ttl").(string)}
+	record := &dozens.Record{SName: name, Type: d.Get("type").(string), Prio: d.Get("priority").(string), Content: d.Get("address").(string), Ttl: d.Get("ttl").(string)}
 	record, err = client.AddRecord(domain, record)
 	if err != nil {
 		return err
@@ -65,10 +65,17 @@ func readRecord(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	list, err := client.ListRecords(domain)
 	for _, record := range list {
-		if record.Name == name {
+		if record.FQName == (name + "." + domain.Name) {
 			applyRecord(record, d)
 		}
 	}
+	return err
+}
+
+func updateRecord(d *schema.ResourceData, m interface{}) error {
+	client := m.(*dozens.Client)
+	record := &dozens.Record{Id: d.Id(), Prio: d.Get("priority").(string), Content: d.Get("address").(string), Ttl: d.Get("ttl").(string)}
+	_, err := client.EditRecord(record)
 	return err
 }
 
@@ -85,7 +92,7 @@ func deleteRecord(d *schema.ResourceData, m interface{}) error {
 	}
 	var rdel *dozens.Record
 	for _, record := range list {
-		if record.Name == name {
+		if record.FQName == (name + "." + domain.Name) {
 			rdel = record
 		}
 	}
@@ -95,10 +102,9 @@ func deleteRecord(d *schema.ResourceData, m interface{}) error {
 }
 
 func applyRecord(r *dozens.Record, d *schema.ResourceData) {
-  d.SetId(r.Id)
-  d.Set("name", r.Name)
-  d.Set("type", r.Type)
-  d.Set("priority", r.Prio)
-  d.Set("address", r.Content)
-  d.Set("ttl", r.Ttl)
+	d.SetId(r.Id)
+	d.Set("type", r.Type)
+	d.Set("priority", r.Prio)
+	d.Set("address", r.Content)
+	d.Set("ttl", r.Ttl)
 }

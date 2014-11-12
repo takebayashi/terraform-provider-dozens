@@ -29,17 +29,22 @@ func createDomain(d *schema.ResourceData, m interface{}) error {
 	mail := d.Get("mail").(string)
 	domain, err := m.(*dozens.Client).AddDomain(domain, mail)
 	if err != nil {
+		return err
 	}
 	applyDomain(domain, d)
 	return nil
 }
 
 func readDomain(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	domain, err := m.(*dozens.Client).GetDomain(name)
+	list, err := m.(*dozens.Client).ListDomains()
 	if err != nil {
+		return err
 	}
-	applyDomain(domain, d)
+	for _, e := range list {
+		if e.Id == d.Id() {
+			applyDomain(e, d)
+		}
+	}
 	return nil
 }
 

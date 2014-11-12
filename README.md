@@ -1,8 +1,11 @@
 terraform-provider-dozens
 =========================
 
+Terraform provider plugin to access [Dozens](https://dozens.jp/) DNS API.
+
 Usage
 -------------------------
+
 ```
 provider "dozens" {
   user = "YOUR_DOZENS_USERNAME"
@@ -27,6 +30,13 @@ resource "dozens_record" "test_example_org" {
 
 Installation
 -------------------------
+
 ```
 go get -u github.com/takebayashi/terraform-provider-dozens
 ```
+
+
+License
+-------------------------
+
+[MIT License](./LICENSE)

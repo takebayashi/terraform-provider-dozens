@@ -64,12 +64,17 @@ func readRecord(d *schema.ResourceData, m interface{}) error {
 	}
 	name := d.Get("name").(string)
 	list, err := client.ListRecords(domain)
+	if err != nil {
+		return err
+	}
 	for _, record := range list {
 		if record.FQName == (name + "." + domain.Name) {
 			applyRecord(record, d)
+			return nil
 		}
 	}
-	return err
+	d.SetId("")
+	return nil
 }
 
 func updateRecord(d *schema.ResourceData, m interface{}) error {

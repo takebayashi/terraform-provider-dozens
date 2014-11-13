@@ -43,8 +43,10 @@ func readDomain(d *schema.ResourceData, m interface{}) error {
 	for _, e := range list {
 		if e.Id == d.Id() {
 			applyDomain(e, d)
+			return nil
 		}
 	}
+	d.SetId("")
 	return nil
 }
 

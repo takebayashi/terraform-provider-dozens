@@ -9,7 +9,7 @@ func resourceDomain() *schema.Resource {
 	return &schema.Resource{
 		Create: createDomain,
 		Read:   readDomain,
-		Update: nil,
+		Update: updateDomain,
 		Delete: deleteDomain,
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -20,7 +20,7 @@ func resourceDomain() *schema.Resource {
 			"mail": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 		},
 	}
@@ -50,6 +50,18 @@ func readDomain(d *schema.ResourceData, m interface{}) error {
 	}
 	d.SetId("")
 	return nil
+}
+
+func updateDomain(d *schema.ResourceData, m interface{}) error {
+	name := d.Get("name").(string)
+	domain, err := m.(*dozens.Client).GetDomain(name)
+	if err != nil {
+		return err
+	}
+	mail := d.Get("mail").(string)
+	domain, err = m.(*dozens.Client).UpdateDomain(domain, mail)
+	applyDomain(domain, d)
+	return err
 }
 
 func deleteDomain(d *schema.ResourceData, m interface{}) error {

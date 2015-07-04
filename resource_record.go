@@ -63,12 +63,18 @@ func readRecord(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	name := d.Get("name").(string)
+	fqname := name + "." + domain.Name
+	if name == "" {
+		fqname = domain.Name
+	}
+
 	list, err := client.ListRecords(domain)
 	if err != nil {
 		return err
 	}
+
 	for _, record := range list {
-		if record.FQName == (name + "." + domain.Name) {
+		if record.FQName == fqname {
 			applyRecord(record, d)
 			return nil
 		}

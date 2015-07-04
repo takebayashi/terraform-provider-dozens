@@ -15,14 +15,17 @@ func resourceRecord() *schema.Resource {
 			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"address": &schema.Schema{
 				Type:     schema.TypeString,

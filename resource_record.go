@@ -102,8 +102,12 @@ func deleteRecord(d *schema.ResourceData, m interface{}) error {
 		return nil
 	}
 	var rdel *dozens.Record
+	fqname := name + "." + domain.Name
+	if name == "" {
+		fqname = domain.Name
+	}
 	for _, record := range list {
-		if record.FQName == (name + "." + domain.Name) {
+		if record.FQName == fqname {
 			rdel = record
 		}
 	}
